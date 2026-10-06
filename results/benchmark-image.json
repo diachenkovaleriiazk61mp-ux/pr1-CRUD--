@@ -1,0 +1,21 @@
+{
+  "size_bytes": 243873936,
+  "base_digest": "debian:12-slim@sha256:7c7b2c966bc9ee8cedfeef67e0e279108992c77681fa595db4a9d65c06ccc587",
+  "base_layers": [
+    "sha256:e58989146fcec76699871403b9897b5c014af1ccd85f5a9300a215e7975525d7"
+  ],
+  "service_layers": [
+    "sha256:e58989146fcec76699871403b9897b5c014af1ccd85f5a9300a215e7975525d7",
+    "sha256:a1c596f21abba7c250ea249c42be4ad58d8b94616d99268ef7e6a98055b6af80",
+    "sha256:a2905817c75033ce599873bcab43bc525d77b154ee85057a5b426305cedf1d50",
+    "sha256:ff136ff6534cc3f2df82bf0d715394d781b99127c8ddae3fdb30b390b3060ac6",
+    "sha256:91f6226179dfca80df5c2ebdba15e7b02f2370fd3eec0fd45057aaa3074034c1"
+  ],
+  "same_base_layers": true,
+  "first_build_base_layers": [
+    "sha256:e58989146fcec76699871403b9897b5c014af1ccd85f5a9300a215e7975525d7"
+  ],
+  "second_build_base_layers": [
+    "sha256:e58989146fcec76699871403b9897b5c014af1ccd85f5a9300a215e7975525d7"
+  ]
+}
