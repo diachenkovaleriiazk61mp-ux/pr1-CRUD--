@@ -1,0 +1,14 @@
+test_overlap_integral_and_completion_window (test_metrics.MetricsTests.test_overlap_integral_and_completion_window) ... ok
+test_reuses_connection_and_keeps_query (test_metrics.TransportTests.test_reuses_connection_and_keeps_query) ... ok
+test_transport_failure_records_reason (test_metrics.TransportTests.test_transport_failure_records_reason) ... ok
+test_boundaries (test_validation.ValidationTests.test_boundaries) ... ok
+test_dates (test_validation.ValidationTests.test_dates) ... ok
+test_full_replacement_and_server_id (test_validation.ValidationTests.test_full_replacement_and_server_id) ... ok
+test_http_validation_and_unavailable_health (test_validation.ValidationTests.test_http_validation_and_unavailable_health) ... ok
+test_invalid_json_shapes (test_validation.ValidationTests.test_invalid_json_shapes) ... ok
+test_strings (test_validation.ValidationTests.test_strings) ... ok
+
+----------------------------------------------------------------------
+Ran 9 tests in 0.120s
+
+OK

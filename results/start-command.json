@@ -1,0 +1,12 @@
+{
+  "success": true,
+  "health": {
+    "method": "GET",
+    "path": "/healthz",
+    "status": 200,
+    "body": {
+      "status": "ready"
+    },
+    "instance": "a07b269d290f"
+  }
+}

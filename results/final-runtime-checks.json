@@ -1,0 +1,179 @@
+[
+  {
+    "method": "POST",
+    "path": "/vaccinations",
+    "status": 201,
+    "body": {
+      "administration_date": "2026-10-06",
+      "batch": "B007",
+      "dose_number": 1,
+      "facility": "Clinic 7",
+      "id": 1,
+      "patient_code": "P007",
+      "vaccine": "HepB"
+    },
+    "instance": "a07b269d290f"
+  },
+  {
+    "method": "GET",
+    "path": "/vaccinations/1",
+    "status": 200,
+    "body": {
+      "administration_date": "2026-10-06",
+      "batch": "B007",
+      "dose_number": 1,
+      "facility": "Clinic 7",
+      "id": 1,
+      "patient_code": "P007",
+      "vaccine": "HepB"
+    },
+    "instance": "a07b269d290f"
+  },
+  {
+    "method": "PUT",
+    "path": "/vaccinations/1",
+    "status": 200,
+    "body": {
+      "administration_date": "2026-10-06",
+      "batch": "B007",
+      "dose_number": 1,
+      "facility": "Clinic 7",
+      "id": 1,
+      "patient_code": "P008",
+      "vaccine": "MMR"
+    },
+    "instance": "a07b269d290f"
+  },
+  {
+    "method": "DELETE",
+    "path": "/vaccinations/1",
+    "status": 204,
+    "body": null,
+    "instance": "a07b269d290f"
+  },
+  {
+    "method": "DELETE",
+    "path": "/vaccinations/1",
+    "status": 404,
+    "body": {
+      "errors": {
+        "id": "Запис не знайдено"
+      }
+    },
+    "instance": "a07b269d290f"
+  },
+  {
+    "method": "POST",
+    "path": "/vaccinations",
+    "status": 400,
+    "body": {
+      "errors": {
+        "dose_number": "Ціле число від 1 до 4"
+      }
+    },
+    "instance": "a07b269d290f"
+  },
+  {
+    "method": "GET",
+    "path": "/vaccinations?limit=10&vaccine=MMR",
+    "status": 200,
+    "body": {
+      "items": [
+        {
+          "administration_date": "2026-10-06",
+          "batch": "B007",
+          "dose_number": 1,
+          "facility": "Clinic 7",
+          "id": 2,
+          "patient_code": "P000",
+          "vaccine": "MMR"
+        },
+        {
+          "administration_date": "2026-10-06",
+          "batch": "B007",
+          "dose_number": 1,
+          "facility": "Clinic 7",
+          "id": 4,
+          "patient_code": "P002",
+          "vaccine": "MMR"
+        },
+        {
+          "administration_date": "2026-10-06",
+          "batch": "B007",
+          "dose_number": 1,
+          "facility": "Clinic 7",
+          "id": 6,
+          "patient_code": "P004",
+          "vaccine": "MMR"
+        },
+        {
+          "administration_date": "2026-10-06",
+          "batch": "B007",
+          "dose_number": 1,
+          "facility": "Clinic 7",
+          "id": 8,
+          "patient_code": "P006",
+          "vaccine": "MMR"
+        },
+        {
+          "administration_date": "2026-10-06",
+          "batch": "B007",
+          "dose_number": 1,
+          "facility": "Clinic 7",
+          "id": 10,
+          "patient_code": "P008",
+          "vaccine": "MMR"
+        },
+        {
+          "administration_date": "2026-10-06",
+          "batch": "B007",
+          "dose_number": 1,
+          "facility": "Clinic 7",
+          "id": 12,
+          "patient_code": "P010",
+          "vaccine": "MMR"
+        },
+        {
+          "administration_date": "2026-10-06",
+          "batch": "B007",
+          "dose_number": 1,
+          "facility": "Clinic 7",
+          "id": 14,
+          "patient_code": "P012",
+          "vaccine": "MMR"
+        },
+        {
+          "administration_date": "2026-10-06",
+          "batch": "B007",
+          "dose_number": 1,
+          "facility": "Clinic 7",
+          "id": 16,
+          "patient_code": "P014",
+          "vaccine": "MMR"
+        },
+        {
+          "administration_date": "2026-10-06",
+          "batch": "B007",
+          "dose_number": 1,
+          "facility": "Clinic 7",
+          "id": 18,
+          "patient_code": "P016",
+          "vaccine": "MMR"
+        },
+        {
+          "administration_date": "2026-10-06",
+          "batch": "B007",
+          "dose_number": 1,
+          "facility": "Clinic 7",
+          "id": 20,
+          "patient_code": "P018",
+          "vaccine": "MMR"
+        }
+      ],
+      "limit": 10,
+      "offset": 0,
+      "total": 50
+    },
+    "instance": "a07b269d290f"
+  }
+]
