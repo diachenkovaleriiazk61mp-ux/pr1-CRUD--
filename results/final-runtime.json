@@ -1,0 +1,15 @@
+{
+  "audit": {
+    "absent": {
+      "pip": true,
+      "setuptools": true,
+      "wheel": true
+    },
+    "gcc": null,
+    "make": null,
+    "app_sha256": "7bc0e9365c9788adf3c5da0031f1c7015950e788feed7a758dd0560db2055b6d"
+  },
+  "cpu_limit": 1.5,
+  "memory_limit_bytes": 1073741824,
+  "note": "Performance series used the same app and runtime dependencies before removal of unused packaging tools. Final image size/startup and CRUD rechecked."
+}
