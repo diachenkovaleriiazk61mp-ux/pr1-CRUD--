@@ -1,4 +1,3 @@
-"""Stateless vaccination CRUD API. All persistent state lives in PostgreSQL."""
 import os
 import socket
 from datetime import date
