@@ -1,0 +1,51 @@
+name: vaccinations-pr1
+services:
+  db:
+    image: postgres:16.10-bookworm
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-vaccinations}
+      POSTGRES_USER: ${POSTGRES_USER:-vaccinations}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+      TZ: Europe/Kyiv
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./schema.sql:/docker-entrypoint-initdb.d/001-schema.sql:ro
+    networks: [backend]
+    healthcheck:
+      test: [CMD-SHELL, 'pg_isready -U "$${POSTGRES_USER}" -d "$${POSTGRES_DB}"']
+      interval: 2s
+      timeout: 3s
+      retries: 30
+    restart: unless-stopped
+  web:
+    build: .
+    image: vaccinations-pr1:local
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-vaccinations}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-vaccinations}
+    networks: [backend]
+    depends_on:
+      db:
+        condition: service_healthy
+    cpus: 1.5
+    mem_limit: 1g
+    healthcheck:
+      test: [CMD, /opt/venv/bin/python, -c, 'import urllib.request; urllib.request.urlopen("http://127.0.0.1:8000/healthz", timeout=2)']
+      interval: 2s
+      timeout: 3s
+      retries: 30
+    restart: unless-stopped
+  lb:
+    image: nginx:1.28.0-alpine
+    ports: ['${PORT:-18080}:8080']
+    volumes: ['./nginx.conf:/etc/nginx/nginx.conf:ro']
+    networks: [backend, public]
+    depends_on:
+      web:
+        condition: service_healthy
+    restart: unless-stopped
+networks:
+  backend:
+    internal: true
+  public: {}
+volumes:
+  pgdata: {}
