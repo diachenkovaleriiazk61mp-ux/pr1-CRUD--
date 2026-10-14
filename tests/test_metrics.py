@@ -37,7 +37,6 @@ class TransportTests(unittest.TestCase):
             self.assertIn('test socket failure',result['error'])
             self.assertIsNone(LOCAL.connection)
 
-if __name__=='__main__': unittest.main()
 
 
 class OpenLoopValidityTests(unittest.TestCase):
@@ -63,3 +62,31 @@ class OpenLoopValidityTests(unittest.TestCase):
             independent=worker(('http://unused',500,.2,time.perf_counter()+.05,0,1,64))
         self.assertTrue(validity(summarize(queued,.2,500)))
         self.assertEqual(validity(summarize(independent,.2,500)), [])
+
+class ResponseAccountingTests(unittest.TestCase):
+    def test_transport_failure_is_not_an_http_response(self):
+        rows=[]
+        for start,done,status in [(0,.1,200),(.1,.3,500),(.2,.9,0)]:
+            rows.append(dict(planned=start,sent=start,done=done,status=status,
+                             instance='a',latency_ms=(done-start)*1000,
+                             scheduled_latency_ms=(done-start)*1000,lag_ms=0))
+        s=summarize(rows,1,3)
+        self.assertEqual(s['completed_rps'],3)
+        self.assertEqual(s['achieved_rps'],2)
+        self.assertEqual(s['success_rps'],1)
+        self.assertEqual(s['non_2xx_fraction'],.5)
+        self.assertAlmostEqual(s['transport_error_fraction'],1/3)
+        self.assertAlmostEqual(s['failure_fraction'],2/3)
+        self.assertAlmostEqual(s['p95_ms'],195)
+        self.assertGreater(s['attempt_p95_ms'],s['p95_ms'])
+
+    def test_no_http_response_has_no_response_percentile(self):
+        row=dict(planned=0,sent=0,done=.2,status=0,instance='',latency_ms=200,
+                 scheduled_latency_ms=200,lag_ms=0)
+        s=summarize([row],1,1)
+        self.assertEqual(s['achieved_rps'],0)
+        self.assertIsNone(s['p95_ms'])
+        self.assertIsNone(s['non_2xx_fraction'])
+        self.assertEqual(s['transport_error_fraction'],1)
+
+if __name__=='__main__': unittest.main()
