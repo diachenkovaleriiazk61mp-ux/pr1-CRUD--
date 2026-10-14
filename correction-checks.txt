@@ -23,3 +23,15 @@ Short no-op smoke check (5 seconds, 2 processes, 256 threads):
   "invalid_reasons": []
 }
 Full Docker experiment not run: Docker unavailable.
+
+2026-10-14: consistency and startup-timing correction.
+16 unit tests passed, including concurrent health polling and Compose failure handling.
+Python compilation passed. Existing benchmark rows were not changed.
+Docker is unavailable here. Corrected startup timing still requires three real runs;
+use scripts/experiment.py --reset-lab-data --startup-only on the Docker host.
+
+2026-10-14: user completed corrected startup measurements on Windows.
+Checked supplied startup.json against REPORT.md: 10.116457500029355, 7.468611499993131, 7.476590699981898 seconds.
+Median: 7.476590699981898 seconds (7.477 rounded); method: concurrent_health_poll.
+Earlier notes about pending startup measurements describe the state before this run.
+Exact 500-rps bottleneck still requires additional diagnostics.
