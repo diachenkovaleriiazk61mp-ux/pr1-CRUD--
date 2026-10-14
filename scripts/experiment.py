@@ -1,4 +1,3 @@
-"""Collect real Docker evidence and regenerate the report. Destructive reset is explicit."""
 import concurrent.futures as cf
 import argparse, json, os, platform, statistics, subprocess, sys, time, urllib.request, urllib.error, shutil
 from datetime import datetime, timezone
@@ -38,7 +37,6 @@ def ready(timeout=90):
     raise TimeoutError('healthz did not become ready')
 
 def measure_startup():
-    """Poll health concurrently with Compose, including time spent inside up."""
     started = time.perf_counter()
     with cf.ThreadPoolExecutor(max_workers=1) as executor:
         launch = executor.submit(compose, 'up', '-d', '--scale', 'web=1')
@@ -86,10 +84,6 @@ def main():
     print('Checking Docker Engine',flush=True)
     cmd('docker','info')
     if a.startup_only:
-        old = OUT/'startup.json'
-        if old.exists():
-            backup = OUT/'startup-before-timing-fix.json'
-            if not backup.exists(): shutil.copyfile(old, backup)
         if not (ROOT/'.env').exists():
             raise RuntimeError('Run start.ps1 or start.sh first to prepare .env and images.')
         global BASE
