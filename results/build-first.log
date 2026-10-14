@@ -1,0 +1,62 @@
+#1 [internal] load local bake definitions
+#1 reading from stdin 565B 0.0s done
+#1 DONE 0.1s
+
+#2 [internal] load build definition from Dockerfile
+#2 transferring dockerfile: 1.20kB 0.0s done
+#2 DONE 0.1s
+
+#3 [internal] load metadata for docker.io/library/debian:12-slim@sha256:7c7b2c966bc9ee8cedfeef67e0e279108992c77681fa595db4a9d65c06ccc587
+#3 DONE 1.9s
+
+#4 [internal] load .dockerignore
+#4 transferring context: 139B 0.0s done
+#4 DONE 0.0s
+
+#5 [internal] load build context
+#5 transferring context: 63B done
+#5 DONE 0.0s
+
+#6 [builder 1/5] FROM docker.io/library/debian:12-slim@sha256:7c7b2c966bc9ee8cedfeef67e0e279108992c77681fa595db4a9d65c06ccc587
+#6 resolve docker.io/library/debian:12-slim@sha256:7c7b2c966bc9ee8cedfeef67e0e279108992c77681fa595db4a9d65c06ccc587 0.0s done
+#6 DONE 0.0s
+
+#7 [runtime 3/5] COPY --from=builder /opt/venv /opt/venv
+#7 CACHED
+
+#8 [builder 2/5] RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends python3 python3-venv ca-certificates && rm -rf /var/lib/apt/lists/*
+#8 CACHED
+
+#9 [builder 4/5] COPY requirements.txt /tmp/requirements.txt
+#9 CACHED
+
+#10 [builder 5/5] RUN /opt/venv/bin/pip install --no-cache-dir -r /tmp/requirements.txt && /opt/venv/bin/pip uninstall -y pip setuptools wheel
+#10 CACHED
+
+#11 [runtime 4/5] WORKDIR /app
+#11 CACHED
+
+#12 [runtime 2/5] RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends python3 ca-certificates tzdata && rm -rf /var/lib/apt/lists/* && useradd --uid 10001 --create-home app
+#12 CACHED
+
+#13 [builder 3/5] RUN python3 -m venv /opt/venv
+#13 CACHED
+
+#14 [runtime 5/5] COPY app.py /app/app.py
+#14 CACHED
+
+#15 exporting to image
+#15 exporting layers done
+#15 exporting manifest sha256:ebb0e1943887fc01d97fdf3164ab7bbc4d4744ec30e9935bc83ef3c92d41cf4c done
+#15 exporting config sha256:3b3c72ac2a129bc4e6355eec3572743ac14ed51a796cbcea0583835c9027c0c8 done
+#15 exporting attestation manifest sha256:8b6dd7eb0c79eca6a39f3ebb32a578bfaf82b5ddebb502121ad3cf65d95eb43e 0.0s done
+#15 exporting manifest list sha256:e6baedb2981f923c0492cbaed170a6edbe4b17cae1616bcac23da0e3e443bea3 0.0s done
+#15 naming to docker.io/library/vaccinations-pr1:local done
+#15 unpacking to docker.io/library/vaccinations-pr1:local 0.0s done
+#15 DONE 0.1s
+
+#16 resolving provenance for metadata file
+#16 DONE 0.0s
+--progress is a global compose flag, better use `docker compose --progress xx build ...
+ Image vaccinations-pr1:local Building 
+ Image vaccinations-pr1:local Built 
