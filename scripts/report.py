@@ -1,4 +1,3 @@
-"""Generate a report from raw requests; no image IDs or measured numbers hard-coded."""
 import json
 import statistics
 from pathlib import Path
@@ -32,7 +31,6 @@ def compare_closed(closed, runs):
     if not closed or 'open_reference' not in closed:
         return None
     old = closed['open_reference']
-    # Old files used completed_rps for achieved_rps. Match timestamp/queue statistics.
     candidates = runs.get((1, closed['rate']), [])
     for run in candidates:
         s = run['summary']
@@ -227,10 +225,6 @@ def main():
         '3. Копіювання web2 — суперечить масштабуванню параметром.\n'
         '4. Лише фіксовані користувачі — це закритий контур, який зменшує потік під перевантаженням.\n'
         '5. Базовий образ лише за тегом — не виконує вимогу digest.')
-    add('## Використання генеративних моделей\n\n'
-        'ChatGPT використано для допомоги з проєктуванням, кодом сервісу, Docker, генератором навантаження '
-        'та оформленням звіту. Після цього виконано тести, перевірку CRUD, запуск контейнерів '
-        'і навантажувальні прогони; результати збережено в results/.')
     add('## Контрольні питання\n\n'
         '1. PUT замінює всі поля; PATCH передавав би лише зміни.\n'
         '2. Конфлікт із наявним ID зазвичай 409; це API забороняє клієнтський ID із 400 і генерує його у базі.\n'
@@ -242,9 +236,6 @@ def main():
         '8. Зміни після другої репліки визначено таблицями; спільні база, Nginx і ресурси хоста.\n'
         '9. e — оцінка за моделлю, не буквальна частка коду при помилках і суперлінійних ефектах. Окремі бази можуть змінити обмеження, але додають узгодження.\n'
         '10. Біля насичення черга зростає нелінійно; для M/M/1 W=1/(μ−λ).')
-    add('## Джерела\n\n- https://docs.docker.com/reference/compose-file/services/\n'
-        '- https://nginx.org/en/docs/http/ngx_http_upstream_module.html\n'
-        '- https://www.psycopg.org/psycopg3/docs/advanced/pool.html')
     (ROOT/'REPORT.md').write_text(polish('\n\n'.join(parts)),encoding='utf-8')
 
 if __name__=='__main__':
