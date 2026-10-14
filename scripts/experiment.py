@@ -46,7 +46,7 @@ def measure_startup():
         elapsed = None
         while time.perf_counter() < deadline:
             if launch.done():
-                launch.result()  # Surface Compose failures immediately.
+                launch.result()  
             try:
                 with urllib.request.urlopen(BASE + '/healthz', timeout=.5) as response:
                     if response.status == 200:
@@ -86,7 +86,6 @@ def main():
     print('Checking Docker Engine',flush=True)
     cmd('docker','info')
     if a.startup_only:
-        # Keep the original evidence. This mode does not replace load results.
         old = OUT/'startup.json'
         if old.exists():
             backup = OUT/'startup-before-timing-fix.json'
@@ -99,7 +98,6 @@ def main():
         collect_startups()
         cmd(sys.executable,str(ROOT/'scripts/report.py'))
         return
-    # Keep old evidence separate: never combine results from different experiments.
     existing = list(OUT.iterdir())
     if existing:
         archive = ROOT/'history'/datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%S%fZ')
@@ -161,7 +159,6 @@ def main():
     filtered=api('GET','/vaccinations?vaccine=MMR&limit=10&offset=5',expected=200)
     assert filtered['body']['total']==50 and len(filtered['body']['items'])==10
     journal.append(filtered)
-    # Verify readiness reports 503 while PostgreSQL is actually stopped.
     compose('stop','db')
     journal.append(api('GET','/healthz',expected=503))
     compose('start','db'); ready()
