@@ -3,7 +3,7 @@ import argparse, concurrent.futures as cf, json, math, multiprocessing as mp
 import os, sys, time, http.client, threading
 from urllib.parse import urlsplit
 LOCAL = threading.local()
-GENERATOR_VERSION = 2
+GENERATOR_VERSION = 3
 
 def validity(summary):
     rate = summary.get('target_rps')
@@ -66,7 +66,12 @@ def quantile(values, q):
     return values[lo]+(values[min(lo+1, len(values)-1)]-values[lo])*(pos-lo)
 
 def summarize(rows, duration, rate=None):
-    latency = [r['latency_ms'] for r in rows]
+    if duration <= 0 or not rows:
+        raise ValueError('duration and request count must be positive')
+    responses = [r for r in rows if 100 <= r['status'] <= 599]
+    latency = [r['latency_ms'] for r in responses]
+    def percentile(values, q):
+        return quantile(values, q) if values else None
     # Requests crossing the right boundary contribute only their observed overlap.
     area = sum(max(0, min(r['done'], duration)-max(0, r['sent'])) for r in rows)
     in_window = [r for r in rows if 0 <= r['done'] <= duration]
@@ -78,11 +83,18 @@ def summarize(rows, duration, rate=None):
         maximum = max(active, maximum)
     return dict(target_rps=rate, duration=duration, requests=len(rows),
                 sent_rps=sum(r['sent'] < duration for r in rows)/duration,
-                achieved_rps=len(in_window)/duration,
+                metrics_version=3,
+                completed_rps=len(in_window)/duration,
+                achieved_rps=sum(100 <= r['status'] <= 599 for r in in_window)/duration,
                 success_rps=sum(200 <= r['status'] < 300 for r in in_window)/duration,
-                p50_ms=quantile(latency,.5), p95_ms=quantile(latency,.95),
-                p99_ms=quantile(latency,.99), mean_ms=sum(latency)/len(latency),
-                non_2xx_fraction=sum(not 200 <= r['status'] < 300 for r in rows)/len(rows),
+                p50_ms=percentile(latency,.5), p95_ms=percentile(latency,.95),
+                p99_ms=percentile(latency,.99),
+                mean_ms=sum(r['latency_ms'] for r in rows)/len(rows),
+                non_2xx_fraction=(sum(not 200 <= r['status'] < 300 for r in responses)/len(responses) if responses else None),
+                transport_error_fraction=sum(r['status']==0 for r in rows)/len(rows),
+                failure_fraction=sum(not 200 <= r['status'] < 300 for r in rows)/len(rows),
+                response_count=len(responses),
+                attempt_p95_ms=quantile([r['latency_ms'] for r in rows],.95),
                 measured_L=area/duration, max_inflight=maximum,
                 outstanding_at_end=sum(r['sent'] < duration < r['done'] for r in rows),
                 p95_scheduler_lag_ms=quantile([r['lag_ms'] for r in rows],.95),

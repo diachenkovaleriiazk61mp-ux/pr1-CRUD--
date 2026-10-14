@@ -3,7 +3,7 @@ import argparse, json, os, platform, statistics, subprocess, sys, time, urllib.r
 from datetime import datetime, timezone
 from datetime import date, timedelta
 from pathlib import Path
-from loadgen import run_open, run_closed, validity
+from loadgen import run_open, run_closed, validity, GENERATOR_VERSION
 ROOT=Path(__file__).resolve().parents[1]
 OUT=ROOT/'results'
 BASE='http://127.0.0.1:'+os.environ.get('PORT','18080')
@@ -57,7 +57,7 @@ def main():
         archive.mkdir(parents=True)
         for path in existing:
             shutil.move(str(path), archive/path.name)
-    save('series.json', dict(status='running', generator_version=2, processes=a.processes, threads=a.threads))
+    save('series.json', dict(status='running', generator_version=GENERATOR_VERSION, processes=a.processes, threads=a.threads))
     if not (ROOT/'.env').exists():
         import secrets
         (ROOT/'.env').write_text('POSTGRES_PASSWORD='+secrets.token_hex(24)+'\nPOSTGRES_USER=vaccinations\nPOSTGRES_DB=vaccinations\nPORT=18080\n',encoding='utf-8')
@@ -170,7 +170,7 @@ def main():
         save('series.json', dict(status='incomplete', reason='No overloaded valid open-loop level found for closed-loop comparison'))
         cmd(sys.executable,str(ROOT/'scripts/report.py'))
         raise RuntimeError('1000 rps is not overloaded; choose a higher diagnostic level for the closed-loop comparison.')
-    save('series.json', dict(status='complete', generator_version=2, processes=a.processes, threads=a.threads, image_id=image['Id']))
+    save('series.json', dict(status='complete', generator_version=GENERATOR_VERSION, processes=a.processes, threads=a.threads, image_id=image['Id']))
     cmd(sys.executable,str(ROOT/'scripts/report.py'))
     print('Results and REPORT.md generated. Lab remains running with one web replica.')
 if __name__=='__main__': main()
