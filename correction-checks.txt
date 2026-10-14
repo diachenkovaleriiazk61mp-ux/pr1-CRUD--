@@ -1,0 +1,25 @@
+2026-10-14: correction validation on this environment (not Docker benchmark evidence).
+11 unit tests passed. Python compilation and shell syntax passed.
+Short no-op smoke check (5 seconds, 2 processes, 256 threads):
+{
+  "target_rps": 500,
+  "duration": 5,
+  "requests": 2500,
+  "sent_rps": 499.8,
+  "achieved_rps": 499.8,
+  "success_rps": 499.8,
+  "p50_ms": 0.41753199997174306,
+  "p95_ms": 1.5628499500394328,
+  "p99_ms": 3.845326470003513,
+  "mean_ms": 0.6222008011994603,
+  "non_2xx_fraction": 0.0,
+  "measured_L": 0.3110136565997209,
+  "max_inflight": 7,
+  "outstanding_at_end": 0,
+  "p95_scheduler_lag_ms": 0.9570250999672647,
+  "p95_scheduled_ms": 2.465211850022789,
+  "instances": [],
+  "valid_open_loop": true,
+  "invalid_reasons": []
+}
+Full Docker experiment not run: Docker unavailable.
