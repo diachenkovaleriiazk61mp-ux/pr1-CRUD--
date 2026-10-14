@@ -1,4 +1,5 @@
 """Collect real Docker evidence and regenerate the report. Destructive reset is explicit."""
+import concurrent.futures as cf
 import argparse, json, os, platform, statistics, subprocess, sys, time, urllib.request, urllib.error, shutil
 from datetime import datetime, timezone
 from datetime import date, timedelta
@@ -36,6 +37,39 @@ def ready(timeout=90):
         time.sleep(.1)
     raise TimeoutError('healthz did not become ready')
 
+def measure_startup():
+    """Poll health concurrently with Compose, including time spent inside up."""
+    started = time.perf_counter()
+    with cf.ThreadPoolExecutor(max_workers=1) as executor:
+        launch = executor.submit(compose, 'up', '-d', '--scale', 'web=1')
+        deadline = started + 90
+        elapsed = None
+        while time.perf_counter() < deadline:
+            if launch.done():
+                launch.result()  # Surface Compose failures immediately.
+            try:
+                with urllib.request.urlopen(BASE + '/healthz', timeout=.5) as response:
+                    if response.status == 200:
+                        elapsed = time.perf_counter() - started
+                        break
+            except (OSError, urllib.error.URLError):
+                pass
+            time.sleep(.1)
+        launch.result()
+        if elapsed is None:
+            raise TimeoutError('healthz did not become ready')
+    return elapsed
+
+def collect_startups():
+    samples = []
+    for index in range(3):
+        print(f'Empty-volume startup {index+1}/3', flush=True)
+        compose('down', '-v')
+        samples.append(measure_startup())
+    save('startup.json', dict(seconds=samples, median_seconds=statistics.median(samples),
+         method='concurrent_health_poll', poll_interval_seconds=.1))
+
+
 def body(i=0):
     return dict(patient_code=f'P{i:03}',vaccine='MMR' if i%2==0 else 'HepB',batch='B007',dose_number=1,administration_date=date.today().isoformat(),facility='Clinic 7')
 
@@ -44,12 +78,27 @@ def main():
     p.add_argument('--reset-lab-data',action='store_true',help='Allow deleting only this Compose project volume')
     p.add_argument('--processes',type=int)
     p.add_argument('--threads',type=int,default=256,help='Threads per generator process; increase if dispatch lag exceeds 100 ms')
+    p.add_argument('--startup-only',action='store_true',help='Repeat only three empty-volume startup measurements; requires existing images')
     a=p.parse_args()
     if not a.reset_lab_data:
         p.error('The required empty-volume tests need --reset-lab-data (deletes this lab database).')
     OUT.mkdir(exist_ok=True)
     print('Checking Docker Engine',flush=True)
     cmd('docker','info')
+    if a.startup_only:
+        # Keep the original evidence. This mode does not replace load results.
+        old = OUT/'startup.json'
+        if old.exists():
+            backup = OUT/'startup-before-timing-fix.json'
+            if not backup.exists(): shutil.copyfile(old, backup)
+        if not (ROOT/'.env').exists():
+            raise RuntimeError('Run start.ps1 or start.sh first to prepare .env and images.')
+        global BASE
+        for line in (ROOT/'.env').read_text(encoding='utf-8-sig').splitlines():
+            if line.startswith('PORT='): BASE='http://127.0.0.1:'+line.split('=',1)[1]
+        collect_startups()
+        cmd(sys.executable,str(ROOT/'scripts/report.py'))
+        return
     # Keep old evidence separate: never combine results from different experiments.
     existing = list(OUT.iterdir())
     if existing:
@@ -63,7 +112,6 @@ def main():
         (ROOT/'.env').write_text('POSTGRES_PASSWORD='+secrets.token_hex(24)+'\nPOSTGRES_USER=vaccinations\nPOSTGRES_DB=vaccinations\nPORT=18080\n',encoding='utf-8')
     for line in (ROOT/'.env').read_text(encoding='utf-8-sig').splitlines():
         if line.startswith('PORT='):
-            global BASE
             BASE='http://127.0.0.1:'+line.split('=',1)[1]
     save('machine.json',dict(platform=platform.platform(),cores=os.cpu_count(),generator_same_host=True,generator_processes=a.processes,generator_threads=a.threads,docker=cmd('docker','version'),compose=compose('version')))
     # No-op check precedes service measurements; keep every raw request.
@@ -93,15 +141,7 @@ def main():
     assert first_layers[:len(base['RootFS']['Layers'])]==base['RootFS']['Layers']
     save('image.json',dict(size_bytes=image['Size'],base_digest=digest,base_layers=base['RootFS']['Layers'],service_layers=image['RootFS']['Layers'],same_base_layers=True,first_build_base_layers=first_layers[:len(base['RootFS']['Layers'])],second_build_base_layers=image['RootFS']['Layers'][:len(base['RootFS']['Layers'])]))
     compose('pull','db','lb')
-    starts=[]
-    for start_index in range(3):
-        print(f'Empty-volume startup {start_index+1}/3',flush=True)
-        compose('down','-v')
-        started=time.perf_counter()
-        compose('up','-d','--scale','web=1')
-        ready()
-        starts.append(time.perf_counter()-started)
-    save('startup.json',dict(seconds=starts,median_seconds=statistics.median(starts)))
+    collect_startups()
     print('CRUD, validation, persistence and readiness checks',flush=True)
     journal=[]
     created=api('POST','/vaccinations',body(),201); journal.append(created)

@@ -1,7 +1,7 @@
 """Verify final packaging after removing build tools; application code/dependencies unchanged."""
 import hashlib, json, statistics, shutil, time, sys
 from pathlib import Path
-from experiment import ROOT, OUT, cmd, compose, api, ready, body, save
+from experiment import ROOT, OUT, cmd, compose, api, ready, body, save, collect_startups
 
 def main():
     # Preserve exact evidence for the image used for performance measurements.
@@ -20,13 +20,7 @@ def main():
     (OUT/'build-first.log').write_text(first,encoding='utf-8')
     (OUT/'build-second.log').write_text(second,encoding='utf-8')
     save('image.json',dict(size_bytes=image['Size'],image_id=image['Id'],base_digest=digest,base_layers=layers,service_layers=image['RootFS']['Layers'],same_base_layers=True,first_build_base_layers=first_image['RootFS']['Layers'][:len(layers)],second_build_base_layers=image['RootFS']['Layers'][:len(layers)]))
-    starts=[]
-    for i in range(3):
-        print(f'Final runtime empty-volume startup {i+1}/3',flush=True)
-        compose('down','-v'); origin=time.perf_counter()
-        compose('up','-d','--scale','web=1'); ready()
-        starts.append(time.perf_counter()-origin)
-    save('startup.json',dict(seconds=starts,median_seconds=statistics.median(starts)))
+    collect_startups()
     journal=[]
     created=api('POST','/vaccinations',body(7),201); journal.append(created)
     path=f"/vaccinations/{created['body']['id']}"
