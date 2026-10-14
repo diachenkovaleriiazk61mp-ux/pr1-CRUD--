@@ -686,9 +686,3 @@ L=λW; W у секундах. Виміряне L — площа sent−completed
 9. e — ефективна частка роботи без виграшу від паралелізму за моделлю. Окрема база могла б зменшити спільну межу, але додала б узгодження та не гарантувала лінійне прискорення.
 10. Поблизу насичення вільна обслуговувальна потужність зменшується; черги зростають нелінійно. У простій M/M/1 моделі W=1/(μ−λ), що різко зростає при λ→μ.
 
-## Джерела
-
-- [Офіційний Debian образ](https://hub.docker.com/_/debian)
-- [Docker Compose services](https://docs.docker.com/reference/compose-file/services/)
-- [Nginx upstream resolve](https://nginx.org/en/docs/http/ngx_http_upstream_module.html#resolve)
-- [Psycopg connection pools](https://www.psycopg.org/psycopg3/docs/advanced/pool.html)
