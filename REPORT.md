@@ -706,8 +706,4 @@ L=λW. L вимірюється як площа (sent−completed) за вікн
 9. e — оцінка за моделлю, не буквальна частка коду при помилках і суперлінійних ефектах. Окремі бази можуть змінити обмеження, але додають узгодження.
 10. Біля насичення черга зростає нелінійно; для M/M/1 W=1/(μ−λ).
 
-## Джерела
 
-- https://docs.docker.com/reference/compose-file/services/
-- https://nginx.org/en/docs/http/ngx_http_upstream_module.html
-- https://www.psycopg.org/psycopg3/docs/advanced/pool.html
